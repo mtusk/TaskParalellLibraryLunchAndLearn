@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace TplLunchAndLearn
@@ -10,9 +11,17 @@ namespace TplLunchAndLearn
         // Not good practice... for demo purposes only
         protected override void OnStartup(StartupEventArgs e)
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Application.Current.DispatcherUnhandledException += DispatcherUnhandledExceptionHandler;
 
             base.OnStartup(e);
+        }
+
+        // Not good practice... for demo purposes only
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            var window = Application.Current.MainWindow as MainWindow;
+            window.Exception = e.ExceptionObject as Exception;
         }
 
         // Not good practice... for demo purposes only

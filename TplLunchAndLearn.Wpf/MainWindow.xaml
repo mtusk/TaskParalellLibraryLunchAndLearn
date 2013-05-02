@@ -124,8 +124,8 @@
             </MenuItem>
             <MenuItem Header="async/await" />
             <MenuItem Header="Exceptions">
-                <MenuItem Header="Unobserved" />
-                <MenuItem Header="Observed" />
+                <MenuItem Header="Unhandled Unobserved Exception" Click="UnhandledUnobservedExceptionMenuItem_Click" />
+                <MenuItem Header="Handled Unobserve Exception" Click="HandledUnobservedExceptionMenuItem_Click" />
             </MenuItem>
         </Menu>
     </Grid>

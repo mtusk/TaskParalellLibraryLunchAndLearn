@@ -42,31 +42,46 @@ namespace TplLunchAndLearn
         }
         #endregion
 
-        private void ExceptionDialog_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            this.Exception = null;
-        }
-
         #region MenuItem Handlers
         private void SynchronousBlockCodeMenuItem_Clicked(object sender, RoutedEventArgs e)
         {
-            Task.Delay(TimeSpan.FromSeconds(5));
+            Thread.Sleep(TimeSpan.FromSeconds(3));
         }
 
         private void AsynchronousProgrammingModelMenuItem_Clicked(object sender, RoutedEventArgs e)
         {
+            throw new Exception("A sample exception");
+            //BeforeTpl.AsynchronousProgrammingModel();
+        }
+
+        private void UnhandledUnobservedExceptionMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Task.Run(() =>
+                {
+                    throw new Exception("A sample exception");
+                });
+        }
+
+        private void HandledUnobservedExceptionMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var uiContext = TaskScheduler.FromCurrentSynchronizationContext();
             Task.Run(() =>
                     {
-                        Task.Delay(TimeSpan.FromSeconds(2));
+                        throw new Exception("A sample exception");
                     })
                 .ContinueWith(t =>
                     {
-                        throw new Exception("A sample exception");            
-                    });
-            
-
-            //BeforeTpl.AsynchronousProgrammingModel();
+                        if (t.Exception != null)
+                        {
+                            throw new Exception("Unobserved exception encountered", t.Exception);
+                        }
+                    }, uiContext);
         }
         #endregion
+
+        private void ExceptionDialog_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            this.Exception = null;
+        }
     }
 }
