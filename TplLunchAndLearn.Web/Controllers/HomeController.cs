@@ -6,17 +6,14 @@ namespace TplLunchAndLearn.Web.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        public async Task<ActionResult> SlowEcho(TimeSpan delay, string input)
         {
-            ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
-
-            return View();
-        }
-
-        public async Task<ActionResult> SlowEcho(object input)
-        {
-            await Task.Delay(TimeSpan.FromSeconds(5));
-            return Json(input);
+            if (delay != null)
+            {
+                await Task.Delay(delay);
+            }
+            
+            return Content(input);
         }
     }
 }

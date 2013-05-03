@@ -5,7 +5,8 @@
         Width="525"
         Height="350"
         Background="#FF404040"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}">
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Icon="Images/hoff.ico">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -49,7 +50,7 @@
                            FontFamily="Segoe Ui Light"
                            FontSize="36"
                            Foreground="White"
-                           Text="Don't Stop" />
+                           Text="Don't Block" />
                 <TextBlock Grid.Column="2"
                            HorizontalAlignment="Right"
                            VerticalAlignment="Center"
@@ -58,74 +59,121 @@
                            Foreground="White"
                            Text="The Hoff" />
 
-                <Path Grid.Column="1"
+                <!--  Message Dialog  -->
+                <Grid Grid.Column="0"
                       Grid.ColumnSpan="2"
-                      Width="300"
                       Height="120"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Top"
+                      Cursor="Hand"
+                      MouseDown="MessageDialog_MouseDown">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Message}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+
+                    <Path Data="M272.025,6.50008 C274.345,6.49879 276.673,6.51379 279.007,6.54529 C428.386,8.56076 548.576,77.3458 547.458,160.181 C546.341,243.016 424.339,308.533 274.959,306.518 C223.61,305.825 175.71,297.243 135.001,282.912 L131.122,281.51 L25.3626,327.514 L73.1598,253.228 L71.1395,251.927 C30.402,225.067 6.0013,190.417 6.50773,152.882 C7.6079,71.3415 125.844,6.58148 272.025,6.50008 z"
+                          Fill="Gray"
+                          RenderTransformOrigin="0.5,0.5"
+                          Stretch="Uniform">
+                        <Path.RenderTransform>
+                            <ScaleTransform ScaleX="-1" />
+                        </Path.RenderTransform>
+                    </Path>
+
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Margin="0,-10,0,0"
+                                   FontFamily="Segoe Ui Light"
+                                   FontSize="28"
+                                   Foreground="White"
+                                   Text="Result:"
+                                   TextAlignment="Center"
+                                   ToolTip="{Binding Exception.Message}" />
+                        <TextBlock FontSize="20"
+                                   Foreground="White"
+                                   Text="{Binding Message}"
+                                   TextAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"
+                                   TextWrapping="NoWrap" />
+                    </StackPanel>
+
+                </Grid>
+
+                <!--  Exception Dialog  -->
+                <Grid Grid.Column="1"
+                      Grid.ColumnSpan="2"
+                      Height="90"
                       HorizontalAlignment="Right"
                       VerticalAlignment="Top"
                       Cursor="Hand"
-                      Data="M272.025,6.50008 C274.345,6.49879 276.673,6.51379 279.007,6.54529 C428.386,8.56076 548.576,77.3458 547.458,160.181 C546.341,243.016 424.339,308.533 274.959,306.518 C223.61,305.825 175.71,297.243 135.001,282.912 L131.122,281.51 L25.3626,327.514 L73.1598,253.228 L71.1395,251.927 C30.402,225.067 6.0013,190.417 6.50773,152.882 C7.6079,71.3415 125.844,6.58148 272.025,6.50008 z"
-                      Fill="White"
-                      MouseDown="ExceptionDialog_MouseDown"
-                      Opacity="0.5"
-                      Stretch="Uniform"
-                      Stroke="White"
-                      StrokeThickness="5">
-                    <Path.Style>
-                        <Style TargetType="Path">
+                      MouseDown="ExceptionDialog_MouseDown">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Exception}" Value="{x:Null}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </Path.Style>
-                </Path>
+                    </Grid.Style>
 
-                <TextBlock Grid.Column="1"
-                           Grid.ColumnSpan="2"
-                           Margin="0,35,25,0"
-                           HorizontalAlignment="Right"
-                           VerticalAlignment="Top"
-                           Cursor="Hand"
-                           FontFamily="Segoe Ui Bold"
-                           FontSize="28"
-                           Foreground="White"
-                           MouseDown="ExceptionDialog_MouseDown"
-                           Text="Exception!">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Exception}" Value="{x:Null}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
+                    <Path Data="M272.025,6.50008 C274.345,6.49879 276.673,6.51379 279.007,6.54529 C428.386,8.56076 548.576,77.3458 547.458,160.181 C546.341,243.016 424.339,308.533 274.959,306.518 C223.61,305.825 175.71,297.243 135.001,282.912 L131.122,281.51 L25.3626,327.514 L73.1598,253.228 L71.1395,251.927 C30.402,225.067 6.0013,190.417 6.50773,152.882 C7.6079,71.3415 125.844,6.58148 272.025,6.50008 z"
+                          Fill="#FFE51400"
+                          Stretch="Uniform" />
+
+                    <TextBlock Margin="0,0,0,5"
+                               VerticalAlignment="Center"
+                               FontFamily="Segoe Ui SemiBold"
+                               FontSize="24"
+                               Foreground="White"
+                               Text="Exception!"
+                               TextAlignment="Center"
+                               ToolTip="{Binding Exception.Message}" />
+                </Grid>
             </Grid>
         </Viewbox>
 
-        <Menu Grid.Row="0"
-              Background="#FF666666"
-              BorderThickness="0">
+        <Menu Grid.Row="0" Background="#FF666666">
             <MenuItem Header="Before TPL">
-                <MenuItem Header="Synchronous Blocking Code" Click="SynchronousBlockCodeMenuItem_Clicked" />
-                <MenuItem Click="AsynchronousProgrammingModelMenuItem_Clicked" Header="Asynchronous Programming Model" />
-                <MenuItem Header="Event-based Asynchronous Pattern" />
-                <MenuItem Header="BackgroundWorker" />
-                <MenuItem Header="ThreadPool" />
+                <MenuItem Click="SynchronousBlockCodeMenuItem_Clicked"
+                          Header="Synchronous Blocking Code"
+                          ToolTip="Synchronous code that will block the UI." />
+                <MenuItem Click="AsynchronousProgrammingModelMenuItem_Clicked"
+                          Header="Asynchronous Programming Model"
+                          ToolTip="Example of an API that uses the Asynchronous Programming Model (APM)." />
+                <MenuItem Header="Event-based Asynchronous Pattern" IsEnabled="False" />
+                <MenuItem Header="BackgroundWorker" IsEnabled="False" />
+                <MenuItem Header="ThreadPool" IsEnabled="False" />
             </MenuItem>
             <MenuItem Header="With TPL">
-                <MenuItem Header="Task.Run" />
-                <MenuItem Header="SynchronizationContext" />
-                <MenuItem Header="ContinueWhenAll" />
+                <MenuItem Click="TaskRunMenuItem_Click"
+                          Header="Task.Run"
+                          ToolTip="Example of using Task.Run to run code asynchronously." />
+                <MenuItem Click="TaskWaitMenuItem_Click"
+                          Header="Task.Wait"
+                          ToolTip="Example of using Task.Wait to block the current thread." />
+                <MenuItem Header="SynchronizationContext" IsEnabled="False" />
+                <MenuItem Header="ContinueWhenAll" IsEnabled="False" />
             </MenuItem>
-            <MenuItem Header="async/await" />
+            <MenuItem Header="async/await">
+                <MenuItem Header="Empty" IsEnabled="False" />
+            </MenuItem>
             <MenuItem Header="Exceptions">
-                <MenuItem Header="Unhandled Unobserved Exception" Click="UnhandledUnobservedExceptionMenuItem_Click" />
-                <MenuItem Header="Handled Unobserve Exception" Click="HandledUnobservedExceptionMenuItem_Click" />
+                <MenuItem Click="UnhandledUnobservedExceptionMenuItem_Click"
+                          Header="Unhandled Unobserved Exception"
+                          ToolTip="A Task throws an exception that goes unobserved and unhandled." />
+                <MenuItem Click="OnlyOnFaultedMenuItem_Click"
+                          Header="TaskContinuationOptions.OnlyOnFaulted"
+                          ToolTip="A Task executes a continuation only when the task has faulted by the thrown excetpion." />
+                <MenuItem Click="UnobservedTaskExceptionEventMenuItem_Click"
+                          Header="TaskScheduler.UnobservedTaskException"
+                          IsEnabled="False"
+                          ToolTip="An attempt at demonstrating the UnobservedTaskExceptionEvent." />
             </MenuItem>
         </Menu>
     </Grid>

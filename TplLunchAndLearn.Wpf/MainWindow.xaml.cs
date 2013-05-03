@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using TplLunchAndLearn.Model;
 
 namespace TplLunchAndLearn
 {
@@ -25,24 +25,39 @@ namespace TplLunchAndLearn
                 if (value != _exception)
                 {
                     _exception = value;
-                    RaisePropertyChanged();
+                    RaisePropertyChanged("Exception");
+                }
+            }
+        }
+
+        private string _message;
+        public string Message
+        {
+            get { return _message; }
+            set
+            {
+                if (value != _message)
+                {
+                    _message = value;
+                    RaisePropertyChanged("Message");
                 }
             }
         }
         #endregion
 
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        #region Event Handlers
+        private void MessageDialog_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            this.Message = null;
+        }
+
+        private void ExceptionDialog_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            this.Exception = null;
         }
         #endregion
 
-        #region MenuItem Handlers
+        #region Before TPL
         private void SynchronousBlockCodeMenuItem_Clicked(object sender, RoutedEventArgs e)
         {
             Thread.Sleep(TimeSpan.FromSeconds(3));
@@ -50,38 +65,100 @@ namespace TplLunchAndLearn
 
         private void AsynchronousProgrammingModelMenuItem_Clicked(object sender, RoutedEventArgs e)
         {
-            throw new Exception("A sample exception");
-            //BeforeTpl.AsynchronousProgrammingModel();
-        }
-
-        private void UnhandledUnobservedExceptionMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            Task.Run(() =>
+            SlowOperations.AsynchronousProgrammingModel(result =>
                 {
-                    throw new Exception("A sample exception");
+                    this.Message = result;
                 });
         }
+        #endregion
 
-        private void HandledUnobservedExceptionMenuItem_Click(object sender, RoutedEventArgs e)
+        #region With TPL
+        private void TaskRunMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var uiContext = TaskScheduler.FromCurrentSynchronizationContext();
+            var uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             Task.Run(() =>
+                    {
+                        return SlowOperations.WebClientDownloadString("TaskRun Test");
+                    })
+                .ContinueWith(t =>
+                    {
+                        this.Message = t.Result;
+                    },
+                uiScheduler);
+        }
+
+        private void TaskWaitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var task = new Task<string>(() =>
+                {
+                    return SlowOperations.WebClientDownloadString("TaskWait Test");
+                });
+            task.Start();
+            task.Wait(); // Blocking call
+            var result = task.Result;
+            this.Message = result;
+        }
+        #endregion
+
+        #region async/await
+        #endregion
+
+        #region Exceptions
+        private void UnhandledUnobservedExceptionMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                throw new Exception("A sample exception");
+            });
+        }
+
+        private void OnlyOnFaultedMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var cancellationToken = new CancellationToken();
+            var uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+
+            Task.Factory
+                .StartNew(() =>
                     {
                         throw new Exception("A sample exception");
                     })
                 .ContinueWith(t =>
+                {
+                    if (t.Exception != null)
                     {
-                        if (t.Exception != null)
+                        Dispatcher.BeginInvoke(new Action(() =>
                         {
                             throw new Exception("Unobserved exception encountered", t.Exception);
-                        }
-                    }, uiContext);
+                        }));
+                    }
+                }, cancellationToken, TaskContinuationOptions.OnlyOnFaulted, uiScheduler);
+        }
+
+        private void UnobservedTaskExceptionEventMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            //TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+
+            //Task.Factory
+            //    .StartNew(() =>
+            //        {
+            //            throw new Exception("A sample exception");
+            //        })
+            //    .ContinueWith(t =>
+            //        {
+            //            TaskScheduler.UnobservedTaskException -= TaskScheduler_UnobservedTaskException;
+            //        });
         }
         #endregion
 
-        private void ExceptionDialog_MouseDown(object sender, MouseButtonEventArgs e)
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void RaisePropertyChanged(string propertyName)
         {
-            this.Exception = null;
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
+        #endregion
     }
 }

@@ -6,8 +6,6 @@ namespace TplLunchAndLearn
 {
     public partial class App : Application
     {
-        public static string ServerPortNumber = "21958";
-
         // Not good practice... for demo purposes only
         protected override void OnStartup(StartupEventArgs e)
         {
