@@ -146,9 +146,15 @@
                 <MenuItem Click="AsynchronousProgrammingModelMenuItem_Clicked"
                           Header="Asynchronous Programming Model"
                           ToolTip="Example of an API that uses the Asynchronous Programming Model (APM)." />
-                <MenuItem Header="Event-based Asynchronous Pattern" IsEnabled="False" />
-                <MenuItem Header="BackgroundWorker" IsEnabled="False" />
-                <MenuItem Header="ThreadPool" IsEnabled="False" />
+                <MenuItem Click="EventBasedAsynchronousPatternMenuItem_Clicked"
+                          Header="Event-based Asynchronous Pattern"
+                          ToolTip="Example of an API that uses the Event-based Asynchronous Pattern (EAP)." />
+                <MenuItem Click="BackgroundWorkerMenuItem_Clicked"
+                          Header="BackgroundWorker"
+                          ToolTip="Example of using a BackgroundWorker." />
+                <MenuItem Click="ThreadPoolMenuItem_Clicked"
+                          Header="ThreadPool.QueueUserWorkItem"
+                          ToolTip="Example of using ThreadPool.QueueUserWorkItem." />
             </MenuItem>
             <MenuItem Header="With TPL">
                 <MenuItem Click="TaskRunMenuItem_Click"
@@ -157,8 +163,12 @@
                 <MenuItem Click="TaskWaitMenuItem_Click"
                           Header="Task.Wait"
                           ToolTip="Example of using Task.Wait to block the current thread." />
-                <MenuItem Header="SynchronizationContext" IsEnabled="False" />
-                <MenuItem Header="ContinueWhenAll" IsEnabled="False" />
+                <MenuItem Click="ContinueWhenAnyMenuItem_Click"
+                          Header="ContinueWhenAny"
+                          ToolTip="Example of using Task.ContinueWhenAny." />
+                <MenuItem Click="ContinueWhenAllMenuItem_Click"
+                          Header="ContinueWhenAll"
+                          ToolTip="Example of using Task.ContinueWhenAll." />
             </MenuItem>
             <MenuItem Header="async/await">
                 <MenuItem Header="Empty" IsEnabled="False" />
@@ -174,6 +184,9 @@
                           Header="TaskScheduler.UnobservedTaskException"
                           IsEnabled="False"
                           ToolTip="An attempt at demonstrating the UnobservedTaskExceptionEvent." />
+                <MenuItem Click="AsyncAwaitExceptionsMenuItem_Click"
+                          Header="Exceptions with async/await"
+                          ToolTip="Example of async/await exception handling." />
             </MenuItem>
         </Menu>
     </Grid>
