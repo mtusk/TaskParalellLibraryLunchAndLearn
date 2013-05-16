@@ -1,7 +1,7 @@
 ﻿<Window x:Class="TplLunchAndLearn.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Don't Stop The Hoff"
+        Title="Don't Block The Hoff"
         Width="525"
         Height="350"
         Background="#FF404040"
@@ -169,24 +169,40 @@
                 <MenuItem Click="ContinueWhenAllMenuItem_Click"
                           Header="ContinueWhenAll"
                           ToolTip="Example of using Task.ContinueWhenAll." />
+                <MenuItem Click="TaskInformationPassingMenuItem_Click"
+                          Header="Strongly-typed information passing."
+                          ToolTip="Example of passing information to task continuations." />
             </MenuItem>
             <MenuItem Header="async/await">
-                <MenuItem Header="Empty" IsEnabled="False" />
+                <MenuItem Click="AsyncAwaitMenuItem_Click"
+                          Header="async/await"
+                          ToolTip="Example of using asyn/await." />
+                <MenuItem Click="AsyncAwaitTaskDelayMenuItem_Click"
+                          Header="Task.Delay"
+                          ToolTip="Example of using Task.Delay with the 'await' keyword to delay the current thread." />
             </MenuItem>
             <MenuItem Header="Exceptions">
                 <MenuItem Click="UnhandledUnobservedExceptionMenuItem_Click"
                           Header="Unhandled Unobserved Exception"
                           ToolTip="A Task throws an exception that goes unobserved and unhandled." />
+                <MenuItem Click="TaskTryCatchMenuItem_Click"
+                          Header="try/catch in Tasks"
+                          ToolTip="Using try/catch in Tasks." />
+                <MenuItem Click="TaskExceptionCheckMenuItem_Click"
+                          Header="Task.Exception check in continuation"
+                          ToolTip="A Task executes a continuation that checks for errors." />
                 <MenuItem Click="OnlyOnFaultedMenuItem_Click"
                           Header="TaskContinuationOptions.OnlyOnFaulted"
-                          ToolTip="A Task executes a continuation only when the task has faulted by the thrown excetpion." />
+                          ToolTip="A Task executes a continuation only when the task has faulted by the thrown exception." />
                 <MenuItem Click="UnobservedTaskExceptionEventMenuItem_Click"
                           Header="TaskScheduler.UnobservedTaskException"
-                          IsEnabled="False"
                           ToolTip="An attempt at demonstrating the UnobservedTaskExceptionEvent." />
                 <MenuItem Click="AsyncAwaitExceptionsMenuItem_Click"
                           Header="Exceptions with async/await"
                           ToolTip="Example of async/await exception handling." />
+                <MenuItem Click="TaskWaitTryCatchMenuItem_Click"
+                          Header="Task.Wait with try/catch"
+                          ToolTip="Using try/catch with Task.Wait" />
             </MenuItem>
         </Menu>
     </Grid>

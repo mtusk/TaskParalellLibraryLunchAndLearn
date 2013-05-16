@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
@@ -180,7 +181,7 @@ namespace TplLunchAndLearn
 
         private void TaskWaitMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var task = Task.Factory.StartNew(() =>
+            var task = Task.Run(() =>
                 {
                     var url = BuildUrl(TimeSpan.FromSeconds(5), "TaskWait Test");
                     return new WebClient().DownloadString(url);
@@ -248,39 +249,79 @@ namespace TplLunchAndLearn
 
             Task.Factory.ContinueWhenAll<string>(tasks, continuation);
         }
+
+        private void TaskInformationPassingMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            Task.Run(() => new List<char>() { 'H', 'O', 'F', 'F' })
+                .ContinueWith(t => string.Join(string.Empty, t.Result))
+                .ContinueWith(t => this.Message = t.Result, uiScheduler);
+        }
         #endregion
 
         #region async/await
-        private async void AsyncAwaitExceptionsMenuItem_Click(object sender, RoutedEventArgs e)
+        private async void AsyncAwaitMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                await Task.Factory.StartNew(() =>
-                {
-                    throw new Exception("Hoff-ception");
-                });
-            }
-            catch (Exception ex)
-            {
-                this.Message = ex.Message;
-            }
+            var url = BuildUrl(TimeSpan.FromSeconds(5), "async/await Test");
+            var client = new WebClient();
+            var result = await client.DownloadStringTaskAsync(url);
+            this.Message = result;
+        }
+
+        private async void AsyncAwaitTaskDelayMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(2));
+            this.Message = "Delayed two seconds";
         }
         #endregion
 
         #region Exceptions
         private void UnhandledUnobservedExceptionMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Task.Factory.StartNew(() =>
-            {
-                throw new Exception("A sample exception");
-            });
+            Task.Run(() =>
+                {
+                    throw new Exception("A sample exception");
+                });
+        }
+
+        private void TaskTryCatchMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Task.Run(() =>
+                {
+                    try
+                    {
+                        throw new Exception("A sample exception");
+                    }
+                    catch (Exception ex)
+                    {
+                        Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                throw new Exception("Unobserved exception encountered", ex);
+                            }));
+                    }
+                });
+        }
+
+        private void TaskExceptionCheckMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Task.Run(() =>
+                    {
+                        throw new Exception("A sample exception");
+                    })
+                .ContinueWith(t =>
+                    {
+                        if (t.Exception != null)
+                        {
+                            Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    throw new Exception("Unobserved exception encountered", t.Exception);
+                                }));
+                        }
+                    });
         }
 
         private void OnlyOnFaultedMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var cancellationToken = new CancellationToken();
-            var uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-
             var exceptionAction = new Action(() =>
                 {
                     throw new Exception("A sample exception");
@@ -296,27 +337,74 @@ namespace TplLunchAndLearn
                     }
                 });
 
-            Task.Factory
-                .StartNew(exceptionAction)
-                .ContinueWith(continuation,
-                    cancellationToken,
-                    TaskContinuationOptions.OnlyOnFaulted,
-                    uiScheduler);
+            Task.Run(exceptionAction)
+                .ContinueWith(continuation, TaskContinuationOptions.OnlyOnFaulted);
         }
 
         private void UnobservedTaskExceptionEventMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            //TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+            var unobservedTaskExceptionHandler = new EventHandler<UnobservedTaskExceptionEventArgs>((sender1, e1) =>
+            {
+                Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        throw new Exception("Unobserved exception encountered", e1.Exception);
+                    }));
+            });
 
-            //Task.Factory
-            //    .StartNew(() =>
-            //        {
-            //            throw new Exception("A sample exception");
-            //        })
-            //    .ContinueWith(t =>
-            //        {
-            //            TaskScheduler.UnobservedTaskException -= TaskScheduler_UnobservedTaskException;
-            //        });
+            TaskScheduler.UnobservedTaskException += unobservedTaskExceptionHandler;
+
+            Task.Run(() =>
+                    {
+                        throw new Exception("A sample exception");
+                    })
+                .ContinueWith(t =>
+                    {
+                        TaskScheduler.UnobservedTaskException -= unobservedTaskExceptionHandler;
+                    });
+        }
+
+        private async void AsyncAwaitExceptionsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await Task.Run(() =>
+                    {
+                        throw new Exception("A sample exception");
+                    });
+            }
+            catch (Exception ex)
+            {
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    throw new Exception("Unobserved exception encountered", ex);
+                }));
+            }
+        }
+
+        private void TaskWaitTryCatchMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Task.Run(() =>
+                {
+                    var exceptionalTask = new Task(() =>
+                        {
+                            
+                            throw new Exception("A sample exception");
+                        });
+
+                    exceptionalTask.Start();
+
+                    try
+                    {
+                        exceptionalTask.Wait(); // blocking call, allows exceptions to be caught using try/catch
+                    }
+                    catch (Exception ex)
+                    {
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            throw new Exception("Exception encountered", ex);
+                        }));
+                    }
+                });
         }
         #endregion
     }
