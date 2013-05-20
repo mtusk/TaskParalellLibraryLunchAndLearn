@@ -156,22 +156,27 @@
                           Header="ThreadPool.QueueUserWorkItem"
                           ToolTip="Example of using ThreadPool.QueueUserWorkItem." />
             </MenuItem>
-            <MenuItem Header="With TPL">
+            <!--<MenuItem Header="Data Parallelism">
+                <MenuItem Click="ParallelForEachMenuItem_Click"
+                          Header="Parallel.ForEach"
+                          ToolTip="Example of using Parallel.ForEach." />
+            </MenuItem>-->
+            <MenuItem Header="Task Parallelism">
                 <MenuItem Click="TaskRunMenuItem_Click"
                           Header="Task.Run"
                           ToolTip="Example of using Task.Run to run code asynchronously." />
                 <MenuItem Click="TaskWaitMenuItem_Click"
                           Header="Task.Wait"
                           ToolTip="Example of using Task.Wait to block the current thread." />
+                <MenuItem Click="StronglyTypedInformationPassingMenuItem_Click"
+                          Header="Strongly-typed information passing."
+                          ToolTip="Example of passing information to task continuations." />
                 <MenuItem Click="ContinueWhenAnyMenuItem_Click"
                           Header="ContinueWhenAny"
                           ToolTip="Example of using Task.ContinueWhenAny." />
                 <MenuItem Click="ContinueWhenAllMenuItem_Click"
                           Header="ContinueWhenAll"
                           ToolTip="Example of using Task.ContinueWhenAll." />
-                <MenuItem Click="TaskInformationPassingMenuItem_Click"
-                          Header="Strongly-typed information passing."
-                          ToolTip="Example of passing information to task continuations." />
             </MenuItem>
             <MenuItem Header="async/await">
                 <MenuItem Click="AsyncAwaitMenuItem_Click"
@@ -194,9 +199,9 @@
                 <MenuItem Click="OnlyOnFaultedMenuItem_Click"
                           Header="TaskContinuationOptions.OnlyOnFaulted"
                           ToolTip="A Task executes a continuation only when the task has faulted by the thrown exception." />
-                <MenuItem Click="UnobservedTaskExceptionEventMenuItem_Click"
+                <!--<MenuItem Click="UnobservedTaskExceptionEventMenuItem_Click"
                           Header="TaskScheduler.UnobservedTaskException"
-                          ToolTip="An attempt at demonstrating the UnobservedTaskExceptionEvent." />
+                          ToolTip="An attempt at demonstrating the UnobservedTaskExceptionEvent." />-->
                 <MenuItem Click="AsyncAwaitExceptionsMenuItem_Click"
                           Header="Exceptions with async/await"
                           ToolTip="Example of async/await exception handling." />

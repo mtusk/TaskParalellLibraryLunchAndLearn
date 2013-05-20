@@ -1,0 +1,27 @@
+﻿
+
+	Before TPL (Pre-.NET 4)
+		Synchronous Blocking Code
+		Asynchronous Programming Model (APM)
+		Event-based Asynchronous Pattern (EAP)
+		BackgroundWorker
+		ThreadPool.QueueUserWorkItem
+
+	Task Parallelism (.NET 4)
+		Task.Run
+		Task.Wait
+		Strongly-typed Information Passing
+		ContinueWhenAny
+		ContinueWhenAll
+
+	async/await (.NET 4.5)
+		async/await
+		Task.Delay
+
+	Exceptions
+		Unhandled Unobserved Exception
+		try/catch in Tasks
+		Task.Exception check in continuation
+		TaskContinuationOptions.OnlyOnFaulted
+		Exceptions with async/await
+		Task.Wait with try/catch

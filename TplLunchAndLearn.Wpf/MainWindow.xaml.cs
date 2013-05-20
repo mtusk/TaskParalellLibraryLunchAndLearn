@@ -82,7 +82,7 @@ namespace TplLunchAndLearn
         }
         #endregion
 
-
+        //--------------------------------------------------
 
         #region Before TPL
         private void SynchronousBlockCodeMenuItem_Clicked(object sender, RoutedEventArgs e)
@@ -96,7 +96,10 @@ namespace TplLunchAndLearn
         {
             var url = BuildUrl(TimeSpan.FromSeconds(5), "APM Test");
             var request = WebRequest.Create(url) as HttpWebRequest;
-            request.BeginGetResponse(new AsyncCallback(AsynchronousProgrammingModelCallback), request);
+            request.BeginGetResponse(
+                new AsyncCallback(
+                    AsynchronousProgrammingModelCallback),
+                    request);
         }
 
         private void AsynchronousProgrammingModelCallback(IAsyncResult asyncResult)
@@ -112,7 +115,8 @@ namespace TplLunchAndLearn
         {
             var url = BuildUrl(TimeSpan.FromSeconds(5), "EAP Test");
             var client = new WebClient();
-            client.DownloadStringCompleted += EventBasedAsynchronousPattern_DownloadStringCompleted;
+            client.DownloadStringCompleted +=
+                EventBasedAsynchronousPattern_DownloadStringCompleted;
             client.DownloadStringAsync(new Uri(url));
         }
 
@@ -160,7 +164,25 @@ namespace TplLunchAndLearn
         }
         #endregion
 
-        #region With TPL
+        #region Data Parallelism
+        private void ParallelForEachMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var data = new List<string>() { "H", "O", "F", "F" };
+            var random = new Random();
+            
+            var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            
+            Parallel.ForEach(data, dataItem =>
+                {
+                    var delay = random.Next(0, 5);
+                    var url = BuildUrl(TimeSpan.FromSeconds(delay), dataItem);
+                    var result = new WebClient().DownloadString(url);
+                    this.Message += result;
+                });
+        }
+        #endregion
+
+        #region Task Parallelism
         private void TaskRunMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
@@ -193,6 +215,14 @@ namespace TplLunchAndLearn
             this.Message = result;
         }
 
+        private void StronglyTypedInformationPassingMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            Task.Run(() => new List<char>() { 'H', 'O', 'F', 'F' })
+                .ContinueWith(t => string.Join(string.Empty, t.Result))
+                .ContinueWith(t => this.Message = t.Result, uiScheduler);
+        }
+
         private void ContinueWhenAnyMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var downloadLetter = new Func<int, string, string>((numberOfSeconds, input) =>
@@ -212,10 +242,10 @@ namespace TplLunchAndLearn
 
             var tasks = new Task[]
                 {
-                    Task.Factory.StartNew(() => downloadLetter(6, "F" )).ContinueWith(appendLetter),
-                    Task.Factory.StartNew(() => downloadLetter(4, "O" )).ContinueWith(appendLetter),
-                    Task.Factory.StartNew(() => downloadLetter(5, "F" )).ContinueWith(appendLetter),
-                    Task.Factory.StartNew(() => downloadLetter(2, "H" )).ContinueWith(appendLetter)
+                    Task.Run(() => downloadLetter(6, "F")).ContinueWith(appendLetter),
+                    Task.Run(() => downloadLetter(4, "O")).ContinueWith(appendLetter),
+                    Task.Run(() => downloadLetter(5, "F")).ContinueWith(appendLetter),
+                    Task.Run(() => downloadLetter(2, "H")).ContinueWith(appendLetter)
                 };
 
             Task.Factory.ContinueWhenAny(tasks, continuation);
@@ -241,21 +271,13 @@ namespace TplLunchAndLearn
 
             var tasks = new Task[]
                 {
-                    Task.Factory.StartNew(() => downloadLetter(6, "F" )).ContinueWith(appendLetter),
-                    Task.Factory.StartNew(() => downloadLetter(4, "O" )).ContinueWith(appendLetter),
-                    Task.Factory.StartNew(() => downloadLetter(5, "F" )).ContinueWith(appendLetter),
-                    Task.Factory.StartNew(() => downloadLetter(2, "H" )).ContinueWith(appendLetter)
+                    Task.Run(() => downloadLetter(6, "F")).ContinueWith(appendLetter),
+                    Task.Run(() => downloadLetter(4, "O")).ContinueWith(appendLetter),
+                    Task.Run(() => downloadLetter(5, "F")).ContinueWith(appendLetter),
+                    Task.Run(() => downloadLetter(2, "H")).ContinueWith(appendLetter)
                 };
 
             Task.Factory.ContinueWhenAll<string>(tasks, continuation);
-        }
-
-        private void TaskInformationPassingMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            var uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-            Task.Run(() => new List<char>() { 'H', 'O', 'F', 'F' })
-                .ContinueWith(t => string.Join(string.Empty, t.Result))
-                .ContinueWith(t => this.Message = t.Result, uiScheduler);
         }
         #endregion
 
@@ -287,19 +309,19 @@ namespace TplLunchAndLearn
         private void TaskTryCatchMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Task.Run(() =>
+            {
+                try
                 {
-                    try
+                    throw new Exception("A sample exception");
+                }
+                catch (Exception ex)
+                {
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        throw new Exception("A sample exception");
-                    }
-                    catch (Exception ex)
-                    {
-                        Dispatcher.BeginInvoke(new Action(() =>
-                            {
-                                throw new Exception("Unobserved exception encountered", ex);
-                            }));
-                    }
-                });
+                        throw new Exception("Unobserved exception encountered", ex);
+                    }));
+                }
+            });
         }
 
         private void TaskExceptionCheckMenuItem_Click(object sender, RoutedEventArgs e)
@@ -313,9 +335,9 @@ namespace TplLunchAndLearn
                         if (t.Exception != null)
                         {
                             Dispatcher.BeginInvoke(new Action(() =>
-                                {
-                                    throw new Exception("Unobserved exception encountered", t.Exception);
-                                }));
+                            {
+                                throw new Exception("Unobserved exception encountered", t.Exception);
+                            }));
                         }
                     });
         }
@@ -331,9 +353,9 @@ namespace TplLunchAndLearn
                     if (t.Exception != null)
                     {
                         Dispatcher.BeginInvoke(new Action(() =>
-                            {
-                                throw new Exception("Unobserved exception encountered", t.Exception);
-                            }));
+                        {
+                            throw new Exception("Unobserved exception encountered", t.Exception);
+                        }));
                     }
                 });
 
@@ -343,13 +365,14 @@ namespace TplLunchAndLearn
 
         private void UnobservedTaskExceptionEventMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var unobservedTaskExceptionHandler = new EventHandler<UnobservedTaskExceptionEventArgs>((sender1, e1) =>
-            {
-                Dispatcher.BeginInvoke(new Action(() =>
+            var unobservedTaskExceptionHandler = new EventHandler<UnobservedTaskExceptionEventArgs>(
+                (sender1, e1) =>
                     {
-                        throw new Exception("Unobserved exception encountered", e1.Exception);
-                    }));
-            });
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            throw new Exception("Unobserved exception encountered", e1.Exception);
+                        }));
+                    });
 
             TaskScheduler.UnobservedTaskException += unobservedTaskExceptionHandler;
 
@@ -384,27 +407,27 @@ namespace TplLunchAndLearn
         private void TaskWaitTryCatchMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Task.Run(() =>
+            {
+                var exceptionalTask = new Task(() =>
+                    {
+                        throw new Exception("A sample exception");
+                    });
+
+                exceptionalTask.Start();
+
+                try
                 {
-                    var exceptionalTask = new Task(() =>
-                        {
-                            
-                            throw new Exception("A sample exception");
-                        });
-
-                    exceptionalTask.Start();
-
-                    try
+                    // blocking call, allows exceptions to be caught using try/catch
+                    exceptionalTask.Wait();
+                }
+                catch (Exception ex)
+                {
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        exceptionalTask.Wait(); // blocking call, allows exceptions to be caught using try/catch
-                    }
-                    catch (Exception ex)
-                    {
-                        Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            throw new Exception("Exception encountered", ex);
-                        }));
-                    }
-                });
+                        throw new Exception("Exception encountered", ex);
+                    }));
+                }
+            });
         }
         #endregion
     }

@@ -115,7 +115,10 @@
     <Resource Include="Images\hoff.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Slides\2 Questions.txt" />
+    <Resource Include="Slides\3 Questions.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Slides\2 Outline.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
