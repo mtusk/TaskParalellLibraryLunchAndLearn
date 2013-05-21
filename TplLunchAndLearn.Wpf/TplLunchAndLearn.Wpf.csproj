@@ -40,8 +40,13 @@
     <ApplicationIcon>Images\hoff.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Entity" />
     <Reference Include="System.Net" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.WebRequest" />
@@ -93,17 +98,19 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Snippets\BuildUrl.snippet" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Slides\1 Introduction.txt" />
+    <None Include="Slides\1 Introduction.txt" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\hoff.png" />
@@ -115,10 +122,16 @@
     <Resource Include="Images\hoff.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Slides\3 Questions.txt" />
+    <None Include="Slides\4 Questions.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Slides\2 Outline.txt" />
+    <None Include="Slides\3 Outline.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Slides\CodeAsWeGo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Slides\2 TPL.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -82,7 +82,11 @@ namespace TplLunchAndLearn
         }
         #endregion
 
+
+
         //--------------------------------------------------
+
+
 
         #region Before TPL
         private void SynchronousBlockCodeMenuItem_Clicked(object sender, RoutedEventArgs e)
@@ -115,112 +119,58 @@ namespace TplLunchAndLearn
         {
             var url = BuildUrl(TimeSpan.FromSeconds(5), "EAP Test");
             var client = new WebClient();
-            client.DownloadStringCompleted +=
-                EventBasedAsynchronousPattern_DownloadStringCompleted;
+            client.DownloadStringCompleted += (sender1, e1) =>
+                {
+                    this.Message = e1.Result;
+                };
             client.DownloadStringAsync(new Uri(url));
-        }
-
-        private void EventBasedAsynchronousPattern_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
-        {
-            var result = e.Result;
-            this.Message = result;
         }
 
         private void BackgroundWorkerMenuItem_Clicked(object sender, RoutedEventArgs e)
         {
             var worker = new BackgroundWorker();
-            worker.DoWork += BackgroundWorkerMenuItem_DoWork;
-            worker.RunWorkerCompleted += BackgroundWorkerMenuItem_RunWorkerCompleted;
+            worker.DoWork += (sender1, e1) =>
+                {
+                    var url = BuildUrl(TimeSpan.FromSeconds(5), "BackgroundWorker Test");
+                    var result = new WebClient().DownloadString(url);
+                    e1.Result = result;
+                };
+            worker.RunWorkerCompleted += (sender1, e1) =>
+                {
+                    this.Message = e1.Result.ToString();
+                };
             worker.RunWorkerAsync();
         }
-
-        private void BackgroundWorkerMenuItem_DoWork(object sender, DoWorkEventArgs e)
-        {
-            var url = BuildUrl(TimeSpan.FromSeconds(5), "BackgroundWorker Test");
-            var result = new WebClient().DownloadString(url);
-            e.Result = result;
-        }
-
-        private void BackgroundWorkerMenuItem_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            var result = e.Result.ToString();
-            this.Message = result;
-        }
-
+        
         private void ThreadPoolMenuItem_Clicked(object sender, RoutedEventArgs e)
         {
-            var action = new Action<object>(obj =>
+            ThreadPool.QueueUserWorkItem(new WaitCallback(obj =>
+            {
+                var url = BuildUrl(TimeSpan.FromSeconds(5), "ThreadPool Test");
+                var result = new WebClient().DownloadString(url);
+
+                Dispatcher.BeginInvoke(new Action<string>(message =>
                 {
-                    var url = BuildUrl(TimeSpan.FromSeconds(5), "ThreadPool Test");
-                    var result = new WebClient().DownloadString(url);
-
-                    Dispatcher.BeginInvoke(new Action<string>(message =>
-                        {
-                            this.Message = message;
-                        }), result);
-                });
-
-            ThreadPool.QueueUserWorkItem(new WaitCallback(action));
-        }
-        #endregion
-
-        #region Data Parallelism
-        private void ParallelForEachMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            var data = new List<string>() { "H", "O", "F", "F" };
-            var random = new Random();
-            
-            var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-            
-            Parallel.ForEach(data, dataItem =>
-                {
-                    var delay = random.Next(0, 5);
-                    var url = BuildUrl(TimeSpan.FromSeconds(delay), dataItem);
-                    var result = new WebClient().DownloadString(url);
-                    this.Message += result;
-                });
+                    this.Message = message;
+                }), result);
+            }));
         }
         #endregion
 
         #region Task Parallelism
         private void TaskRunMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-            var taskAction = new Func<string>(() =>
-                {
-                    var url = BuildUrl(TimeSpan.FromSeconds(5), "TaskRun Test");
-                    var result = new WebClient().DownloadString(url);
-                    return result;
-                });
-            var continuation = new Action<Task<string>>(t =>
-                {
-                    this.Message = t.Result;
-                });
-
-            Task.Run(taskAction)
-                .ContinueWith(continuation, uiScheduler);
+            //
         }
 
         private void TaskWaitMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var task = Task.Run(() =>
-                {
-                    var url = BuildUrl(TimeSpan.FromSeconds(5), "TaskWait Test");
-                    return new WebClient().DownloadString(url);
-                });
-
-            task.Wait(); // Blocking call!!
-
-            var result = task.Result;
-            this.Message = result;
+            //
         }
 
         private void StronglyTypedInformationPassingMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-            Task.Run(() => new List<char>() { 'H', 'O', 'F', 'F' })
-                .ContinueWith(t => string.Join(string.Empty, t.Result))
-                .ContinueWith(t => this.Message = t.Result, uiScheduler);
+            //
         }
 
         private void ContinueWhenAnyMenuItem_Click(object sender, RoutedEventArgs e)
@@ -237,7 +187,7 @@ namespace TplLunchAndLearn
                 });
             var continuation = new Action<Task>(t =>
                 {
-                    this.Message = string.Format("{0}!", this.Message);
+                    this.Message += "!";
                 });
 
             var tasks = new Task[]
@@ -265,8 +215,7 @@ namespace TplLunchAndLearn
                 });
             var continuation = new Func<Task[], string>(t =>
                 {
-                    this.Message = string.Format("{0}!", this.Message);
-                    return this.Message;
+                    return this.Message += "!";
                 });
 
             var tasks = new Task[]
@@ -285,9 +234,7 @@ namespace TplLunchAndLearn
         private async void AsyncAwaitMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var url = BuildUrl(TimeSpan.FromSeconds(5), "async/await Test");
-            var client = new WebClient();
-            var result = await client.DownloadStringTaskAsync(url);
-            this.Message = result;
+            this.Message = await new WebClient().DownloadStringTaskAsync(url);
         }
 
         private async void AsyncAwaitTaskDelayMenuItem_Click(object sender, RoutedEventArgs e)
@@ -344,46 +291,20 @@ namespace TplLunchAndLearn
 
         private void OnlyOnFaultedMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var exceptionAction = new Action(() =>
-                {
-                    throw new Exception("A sample exception");
-                });
-            var continuation = new Action<Task>(t =>
-                {
-                    if (t.Exception != null)
-                    {
-                        Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            throw new Exception("Unobserved exception encountered", t.Exception);
-                        }));
-                    }
-                });
-
-            Task.Run(exceptionAction)
-                .ContinueWith(continuation, TaskContinuationOptions.OnlyOnFaulted);
-        }
-
-        private void UnobservedTaskExceptionEventMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            var unobservedTaskExceptionHandler = new EventHandler<UnobservedTaskExceptionEventArgs>(
-                (sender1, e1) =>
-                    {
-                        Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            throw new Exception("Unobserved exception encountered", e1.Exception);
-                        }));
-                    });
-
-            TaskScheduler.UnobservedTaskException += unobservedTaskExceptionHandler;
-
             Task.Run(() =>
                     {
                         throw new Exception("A sample exception");
                     })
                 .ContinueWith(t =>
                     {
-                        TaskScheduler.UnobservedTaskException -= unobservedTaskExceptionHandler;
-                    });
+                        if (t.Exception != null)
+                        {
+                            Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                throw new Exception("Unobserved exception encountered", t.Exception);
+                            }));
+                        }
+                    }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
         private async void AsyncAwaitExceptionsMenuItem_Click(object sender, RoutedEventArgs e)

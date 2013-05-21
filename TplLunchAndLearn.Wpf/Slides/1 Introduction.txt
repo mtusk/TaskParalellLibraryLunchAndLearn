@@ -1,6 +1,4 @@
-﻿                                                                   
-                                                                   
-            TTTTTTTTTTTTTTTTTTTTTTT PPPPPPPPPPPPPPPPP    LLLLLLLLLLL             
+﻿            TTTTTTTTTTTTTTTTTTTTTTT PPPPPPPPPPPPPPPPP    LLLLLLLLLLL             
             T:::::::::::::::::::::T P::::::::::::::::P   L:::::::::L             
             T:::::::::::::::::::::T P::::::PPPPPP:::::P  L:::::::::L             
             T:::::TT:::::::TT:::::T PP:::::P     P:::::P LL:::::::LL             
@@ -16,8 +14,6 @@
                   T:::::::::T       P::::::::P           L::::::::::::::::::::::L
                   T:::::::::T       P::::::::P           L::::::::::::::::::::::L
                   TTTTTTTTTTT       PPPPPPPPPP           LLLLLLLLLLLLLLLLLLLLLLLL
-
-
 
 
                     Adam Anderson

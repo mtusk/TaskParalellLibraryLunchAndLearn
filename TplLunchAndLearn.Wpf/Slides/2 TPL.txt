@@ -1,0 +1,27 @@
+﻿What is TPL?
+
+	Introduced in .NET 4
+
+	System.Threading
+	System.Threading.Tasks
+
+	It's smart:
+		"The TPL scales the degree of concurrency dynamically to most
+		 efficiently use all the processors that are available." [1]
+
+	Task Parallelism
+		Task, TaskFactory, TaskScheduler
+
+	Data Parallelism, Parallel LINQ
+		Parallel.For(), Parallel.ForEach()
+
+
+
+
+
+
+
+
+
+
+[1] MSDN http://msdn.microsoft.com/en-us/library/dd460717.aspx

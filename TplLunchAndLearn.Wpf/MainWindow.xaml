@@ -6,7 +6,7 @@
         Height="350"
         Background="#FF404040"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Icon="Images/hoff.ico">
+        Icon="Images/hoff.ico" WindowState="Maximized">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -156,11 +156,6 @@
                           Header="ThreadPool.QueueUserWorkItem"
                           ToolTip="Example of using ThreadPool.QueueUserWorkItem." />
             </MenuItem>
-            <!--<MenuItem Header="Data Parallelism">
-                <MenuItem Click="ParallelForEachMenuItem_Click"
-                          Header="Parallel.ForEach"
-                          ToolTip="Example of using Parallel.ForEach." />
-            </MenuItem>-->
             <MenuItem Header="Task Parallelism">
                 <MenuItem Click="TaskRunMenuItem_Click"
                           Header="Task.Run"
