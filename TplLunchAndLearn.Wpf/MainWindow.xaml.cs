@@ -92,8 +92,7 @@ namespace TplLunchAndLearn
         private void SynchronousBlockCodeMenuItem_Clicked(object sender, RoutedEventArgs e)
         {
             var url = BuildUrl(TimeSpan.FromSeconds(5), "Synchronous Test");
-            var result = new WebClient().DownloadString(url);
-            this.Message = result;
+            this.Message = new WebClient().DownloadString(url);
         }
 
         private void AsynchronousProgrammingModelMenuItem_Clicked(object sender, RoutedEventArgs e)
@@ -111,8 +110,7 @@ namespace TplLunchAndLearn
             var request = asyncResult.AsyncState as HttpWebRequest;
             var response = request.EndGetResponse(asyncResult);
             var responseStream = response.GetResponseStream();
-            var result = new StreamReader(responseStream).ReadToEnd();
-            this.Message = result;
+            this.Message = new StreamReader(responseStream).ReadToEnd();
         }
 
         private void EventBasedAsynchronousPatternMenuItem_Clicked(object sender, RoutedEventArgs e)
@@ -160,17 +158,50 @@ namespace TplLunchAndLearn
         #region Task Parallelism
         private void TaskRunMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            //
+            // StartNew is the .NET 4 way of starting a new task.
+            // It is essentially the same thing as Task.Run
+
+            //Task.Factory.StartNew(() => { });
+
+            Task.Run(() =>
+                    {
+                        var url = BuildUrl(TimeSpan.FromSeconds(3), "TaskRun Test");
+                        return new WebClient().DownloadString(url);
+                    })
+                .ContinueWith(t =>
+                    {
+                        this.Message = t.Result;
+                    });
         }
 
         private void TaskWaitMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            //
+            var task = new Task<string>(() =>
+                {
+                    var url = BuildUrl(TimeSpan.FromSeconds(3), "asdf");
+                    return new WebClient().DownloadString(url);
+                });
+            task.Start();
+            task.Wait();
+            this.Message = task.Result;
         }
 
         private void StronglyTypedInformationPassingMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            //
+            var uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+
+            Task.Run(() =>
+                    {
+                        return new List<char>() { 'H', 'O', 'F', 'F' };
+                    })
+                .ContinueWith(t =>
+                    {
+                        return string.Join(string.Empty, t.Result);
+                    })
+                .ContinueWith(t =>
+                    {
+                        return this.Message = t.Result;
+                    }, uiScheduler);
         }
 
         private void ContinueWhenAnyMenuItem_Click(object sender, RoutedEventArgs e)
@@ -318,10 +349,7 @@ namespace TplLunchAndLearn
             }
             catch (Exception ex)
             {
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    throw new Exception("Unobserved exception encountered", ex);
-                }));
+                throw new Exception("Unobserved exception encountered", ex);
             }
         }
 
